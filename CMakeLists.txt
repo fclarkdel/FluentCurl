@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(CppProjectTemplate)
+project(FluentCurl)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(Source/CppProjectTemplate)
+add_subdirectory(Source/FluentCurl)
 
 add_library(
-    CppProjectTemplate
+    FluentCurl
     INTERFACE
 )
 target_link_libraries(
-    CppProjectTemplate
+    FluentCurl
     INTERFACE
-    CppProjectTemplate_Library
+    FluentCurl_Library
 )

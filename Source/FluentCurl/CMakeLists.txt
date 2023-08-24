@@ -1,18 +1,30 @@
 add_library(
-    CppProjectTemplate_Library
+    FluentCurl_Library
     HelloWorld.hpp
     HelloWorld.cpp
 )
 target_include_directories(
-    CppProjectTemplate_Library
+    FluentCurl_Library
     PUBLIC
     ../../Source
 )
 include(FetchContent)
 
+FetchContent_Declare(
+    libcurl
+    URL https://github.com/curl/curl/archive/refs/tags/curl-8_1_2.zip
+)
+FetchContent_MakeAvailable(
+    libcurl
+)
+target_link_libraries(
+    FluentCurl_Library
+    PUBLIC
+    libcurl
+)
 if(PROJECT_IS_TOP_LEVEL)
     add_executable(
-        CppProjectTemplate_Tests
+        FluentCurl_Tests
         HelloWorld.test.cpp
     )
     FetchContent_Declare(
@@ -22,9 +34,9 @@ if(PROJECT_IS_TOP_LEVEL)
     FetchContent_MakeAvailable(googletest)
 
     target_link_libraries(
-        CppProjectTemplate_Tests
+        FluentCurl_Tests
         PRIVATE
-        CppProjectTemplate_Library
+        FluentCurl_Library
         gmock_main
     )
     enable_testing()

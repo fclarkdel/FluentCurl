@@ -1,4 +1,4 @@
-#include <CppProjectTemplate/HelloWorld.hpp>
+#include <FluentCurl/HelloWorld.hpp>
 
 namespace CppProjectTemplate
 {
