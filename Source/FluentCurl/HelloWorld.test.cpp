@@ -1,3 +1,5 @@
+#include <mutex>
+
 #include <gtest/gtest.h>
 
 #include <curl/curl.h>
@@ -6,15 +8,90 @@
 
 using namespace CppProjectTemplate;
 
-TEST(HelloWorld, print)
+struct CurlResource
 {
-	curl_global_init(CURL_GLOBAL_DEFAULT);
+	CurlResource()
+	{
+		std::scoped_lock scoped_lock(_global_lock);
 
-	CURL* easy_handle = curl_easy_init();
+		++curl_resource_count;
 
-	curl_easy_setopt(easy_handle, CURLOPT_URL, "https://example.com/");
+		if(curl_resource_count == 1)
+			curl_global_init(CURL_GLOBAL_DEFAULT);
+	};
+	~CurlResource()
+	{
+		std::scoped_lock scoped_lock(_global_lock);
 
-	auto write_func = [](char* data, size_t data_member_size, size_t data_member_quantity, void* userdata)
+		if(curl_resource_count == 1)
+			curl_global_cleanup();
+
+		--curl_resource_count;
+	}
+
+private:
+	static inline std::mutex _global_lock;
+	static inline size_t curl_resource_count;
+};
+
+namespace Protocols
+{
+struct HTTP
+{
+	static std::string
+	send(std::string data)
+	{
+		return data;
+	}
+};
+}
+
+template<typename Type>
+concept Protocol =
+	requires() {
+		Type::send(std::string("data"));
+	};
+
+template<Protocol protocol>
+struct Session: CurlResource
+{
+	CURL* base_handle;
+	std::string write_to;
+
+	Session():
+		base_handle(curl_easy_init())
+	{
+		curl_easy_setopt(base_handle, CURLOPT_WRITEFUNCTION, &Session::write_func);
+		curl_easy_setopt(base_handle, CURLOPT_WRITEDATA, &write_to);
+	}
+	~Session()
+	{
+		curl_easy_cleanup(base_handle);
+	}
+	void
+	perform()
+	{
+		curl_easy_perform(base_handle);
+	};
+	template<CURLoption curl_opt>
+	Session&
+	option(const char*)
+	{
+		return *this;
+	}
+	std::string
+	send(std::string data)
+	{
+		return protocol::send(data);
+	}
+
+private:
+	static size_t
+	write_func(
+		char* data,
+		size_t data_member_size,
+		size_t data_member_quantity,
+		void* userdata)
 	{
 		size_t total_size = data_member_size * data_member_quantity;
 
@@ -24,24 +101,24 @@ TEST(HelloWorld, print)
 
 		return total_size;
 	};
-	curl_easy_setopt(
-		easy_handle,
-		CURLOPT_WRITEFUNCTION,
-		// '+' operator decays the lambda to a void pointer.
-		+write_func);
+};
+template<>
+template<>
+Session<Protocols::HTTP>&
+Session<Protocols::HTTP>::option<CURLOPT_URL>(const char* url)
+{
+	curl_easy_setopt(base_handle, CURLOPT_URL, url);
 
-	std::string write_to;
-	curl_easy_setopt(easy_handle, CURLOPT_WRITEDATA, &write_to);
+	return *this;
+}
 
-	curl_easy_perform(easy_handle);
+TEST(HelloWorld, print)
+{
+	Session<Protocols::HTTP> session;
 
-	curl_easy_cleanup(easy_handle);
+	session
+		.option<CURLOPT_URL>("https://example.com/")
+		.perform();
 
-	curl_global_cleanup();
-
-	std::cout << write_to << '\n';
-
-	Session<HTTP> http_session;
-
-	http_session.option<CURLOPT_URL>("url");
+	std::cout << session.write_to << '\n';
 }
