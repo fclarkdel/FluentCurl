@@ -1,5 +1,13 @@
 add_library(
     FluentCurl_Library
+    CurlResource.hpp
+    CurlResource.cpp
+    Handle.hpp
+    Handle.cpp
+    HandleOptions.hpp
+    Session.hpp
+    Session.cpp
+
     HelloWorld.hpp
     HelloWorld.cpp
 )
@@ -31,6 +39,9 @@ target_link_libraries(
 if(PROJECT_IS_TOP_LEVEL)
     add_executable(
         FluentCurl_Tests
+        Handle.test.cpp
+        Session.test.cpp
+
         HelloWorld.test.cpp
         Test.test.cpp
     )
