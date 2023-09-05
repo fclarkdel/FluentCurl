@@ -32,6 +32,8 @@ Session::~Session()
 
 	while(uv_loop_close(_event_loop) == UV_EBUSY)
 	{
+		std::scoped_lock scoped_lock(_lock);
+
 		throw_on_uv_error(
 			uv_run(_event_loop, UV_RUN_DEFAULT));
 	}
@@ -41,6 +43,8 @@ Session::~Session()
 void
 Session::perform(const Handle& handle)
 {
+	std::scoped_lock scoped_lock(_lock);
+
 	CURL* curl_handle = curl_easy_init();
 
 	handle.configure_curl_handle(curl_handle);

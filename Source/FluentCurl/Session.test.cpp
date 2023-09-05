@@ -90,27 +90,32 @@ TEST(Session, should_perform_handle)
 }
 TEST(Session, should_perform_handle_thread_safe)
 {
-	Handle handle_0;
-	Handle handle_1;
-
-	std::string write_to_0;
-	std::string write_to_1;
-
-	handle_0
-		.option<CURLOPT_URL>("https://example.com/")
-		.option<CURLOPT_WRITEFUNCTION>(write_cb)
-		.option<CURLOPT_WRITEDATA>(&write_to_0);
-
-	handle_1
-		.option<CURLOPT_URL>("https://example.com/")
-		.option<CURLOPT_WRITEFUNCTION>(write_cb)
-		.option<CURLOPT_WRITEDATA>(&write_to_1);
+	size_t count = 100;
 
 	Session session;
 
-	std::thread worker_0(&Session::perform, &session, handle_0);
-	std::thread worker_1(&Session::perform, &session, handle_1);
+	std::vector<std::string> results;
+	results.reserve(count);
 
-	worker_0.join();
-	worker_1.join();
+	std::vector<Handle> handles;
+	handles.reserve(count);
+
+	std::vector<std::thread> threads;
+	threads.reserve(count);
+
+	for(size_t i = 0; i < count; ++i)
+	{
+		results.emplace_back();
+
+		handles.emplace_back();
+
+		handles[i]
+			.option<CURLOPT_URL>("https://example.com/")
+			.option<CURLOPT_WRITEFUNCTION>(write_cb)
+			.option<CURLOPT_WRITEDATA>(&results[i]);
+
+		threads.emplace_back(&Session::perform, &session, handles[i]);
+	}
+	for(auto& thread: threads)
+		thread.join();
 }

@@ -1,6 +1,8 @@
 #ifndef FLUENTCURL_SESSION_HPP
 #define FLUENTCURL_SESSION_HPP
 
+#include <mutex>
+
 #include <curl/curl.h>
 #include <uv.h>
 
@@ -32,6 +34,7 @@ private:
 	CURLM* _multi_handle;
 	uv_loop_t* _event_loop;
 	uv_timer_t* _timer;
+	std::mutex _lock;
 
 	static void
 	throw_on_curl_multi_error(CURLMcode result);
