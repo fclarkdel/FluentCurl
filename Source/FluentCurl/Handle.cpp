@@ -2,30 +2,22 @@
 
 namespace FluentCurl
 {
-Handle::Handle():
-	handle(curl_easy_init())
-{
-}
-Handle::~Handle()
-{
-	curl_easy_cleanup(handle);
-}
 Handle::Handle(const Handle& copy):
-	handle(curl_easy_duphandle(copy.handle))
+	_curl_opts_and_params(copy._curl_opts_and_params)
 {
 }
 Handle&
 Handle::operator=(const Handle& copy)
 {
 	if(this != &copy)
-		handle = curl_easy_duphandle(copy.handle);
+		_curl_opts_and_params = copy._curl_opts_and_params;
 
 	return *this;
 }
 Handle::Handle(Handle&& move) noexcept:
-	handle(move.handle)
+	_curl_opts_and_params(std::move(move._curl_opts_and_params))
 {
-	move.handle = curl_easy_init();
+	move._curl_opts_and_params.clear();
 }
 Handle&
 Handle::operator=(Handle&& move) noexcept
@@ -33,22 +25,32 @@ Handle::operator=(Handle&& move) noexcept
 	if(this == &move)
 		return *this;
 
-	handle = move.handle;
+	_curl_opts_and_params = std::move(move._curl_opts_and_params);
 
-	move.handle = curl_easy_init();
+	move._curl_opts_and_params.clear();
 
 	return *this;
+}
+void
+Handle::throw_on_curl_easy_error(CURLcode result)
+{
+	if(result != CURLE_OK)
+		throw std::runtime_error(curl_easy_strerror(result));
 }
 Handle&
 Handle::reset()
 {
-	curl_easy_reset(handle);
+	_curl_opts_and_params.clear();
 
 	return *this;
 }
-CURL*
-Handle::raw_handle()
+void
+Handle::configure_curl_handle(CURL* handle) const
 {
-	return handle;
+	for(const curl_opt_and_param& opt_and_param: _curl_opts_and_params)
+	{
+		throw_on_curl_easy_error(
+			curl_easy_setopt(handle, opt_and_param.curl_opt, opt_and_param.param));
+	}
 }
 }

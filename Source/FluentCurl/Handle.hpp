@@ -1,6 +1,8 @@
 #ifndef FLUENTCURL_HANDLE_HPP
 #define FLUENTCURL_HANDLE_HPP
 
+#include <vector>
+
 #include <curl/curl.h>
 
 #include <FluentCurl/CurlResource.hpp>
@@ -11,9 +13,9 @@ namespace FluentCurl
 class Handle: public CurlResource
 {
 public:
-	Handle();
+	friend class Session;
 
-	~Handle();
+	Handle() = default;
 
 	Handle(const Handle& copy);
 
@@ -29,10 +31,7 @@ public:
 	Handle&
 	option(curl_opt_param_t<curl_opt> param)
 	{
-		CURLcode res = curl_easy_setopt(handle, curl_opt, param);
-
-		if(res != CURLE_OK)
-			throw std::runtime_error(curl_easy_strerror(res));
+		_curl_opts_and_params.emplace_back(curl_opt, (void*)std::move(param));
 
 		return *this;
 	};
@@ -40,11 +39,14 @@ public:
 	Handle&
 	reset();
 
-	CURL*
-	raw_handle();
-
 private:
-	CURL* handle;
+	std::vector<curl_opt_and_param> _curl_opts_and_params;
+
+	static void
+	throw_on_curl_easy_error(CURLcode result);
+
+	void
+	configure_curl_handle(CURL* handle) const;
 };
 }
 #endif

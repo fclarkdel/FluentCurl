@@ -7,9 +7,6 @@ add_library(
     HandleOptions.hpp
     Session.hpp
     Session.cpp
-
-    HelloWorld.hpp
-    HelloWorld.cpp
 )
 target_include_directories(
     FluentCurl_Library
@@ -41,9 +38,6 @@ if(PROJECT_IS_TOP_LEVEL)
         FluentCurl_Tests
         Handle.test.cpp
         Session.test.cpp
-
-        HelloWorld.test.cpp
-        Test.test.cpp
     )
     FetchContent_Declare(
         googletest

@@ -1,5 +1,3 @@
-#include <type_traits>
-
 #include <gtest/gtest.h>
 
 #include <FluentCurl/Handle.hpp>
@@ -67,10 +65,4 @@ TEST(Handle, should_reset_options)
 		.option<CURLOPT_WRITEDATA>(&write_to);
 
 	handle.reset();
-}
-TEST(Handle, should_return_raw_handle)
-{
-	Handle handle;
-
-	handle.raw_handle();
 }
