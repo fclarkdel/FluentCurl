@@ -47,10 +47,10 @@ Handle::reset()
 void
 Handle::configure_curl_handle(CURL* handle) const
 {
-	for(const curl_opt_and_param& opt_and_param: _curl_opts_and_params)
+	for(const auto&[opt, param]: _curl_opts_and_params)
 	{
 		throw_on_curl_easy_error(
-			curl_easy_setopt(handle, opt_and_param.curl_opt, opt_and_param.param));
+			curl_easy_setopt(handle, opt, param));
 	}
 }
 }

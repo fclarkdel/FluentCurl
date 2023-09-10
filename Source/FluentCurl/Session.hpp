@@ -1,7 +1,9 @@
 #ifndef FLUENTCURL_SESSION_HPP
 #define FLUENTCURL_SESSION_HPP
 
-#include <mutex>
+#include <shared_mutex>
+#include <queue>
+#include <thread>
 
 #include <curl/curl.h>
 #include <uv.h>
@@ -28,13 +30,21 @@ public:
 	operator=(Session&& move) = delete;
 
 	void
-	perform(const Handle& handle);
+	add_handle(const Handle& handle);
 
 private:
 	CURLM* _multi_handle;
 	uv_loop_t* _event_loop;
 	uv_timer_t* _timer;
-	std::mutex _lock;
+
+	bool _keep_thread_alive;
+	std::thread _thread;
+
+	std::shared_mutex _queue_lock;
+	std::queue<CURL*> _queue;
+
+	void
+	process_handles();
 
 	static void
 	throw_on_curl_multi_error(CURLMcode result);

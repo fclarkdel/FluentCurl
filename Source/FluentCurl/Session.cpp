@@ -5,7 +5,8 @@ namespace FluentCurl
 Session::Session():
 	_multi_handle(curl_multi_init()),
 	_event_loop(uv_default_loop()),
-	_timer(new uv_timer_t)
+	_timer(new uv_timer_t),
+	_keep_thread_alive(true)
 {
 	throw_on_uv_error(
 		uv_timer_init(_event_loop, _timer));
@@ -22,9 +23,18 @@ Session::Session():
 		curl_multi_setopt(_multi_handle, CURLMOPT_TIMERFUNCTION, timer_cb));
 	throw_on_curl_multi_error(
 		curl_multi_setopt(_multi_handle, CURLMOPT_TIMERDATA, _timer));
+
+	_thread = std::thread(&Session::process_handles, this);
 }
 Session::~Session()
 {
+	// We must first kill the thread before locking the queue,
+	// otherwise we will be in a deadlock.
+	_keep_thread_alive = false;
+	_thread.join();
+
+	_queue_lock.lock();
+
 	throw_on_uv_error(
 		uv_timer_stop(_timer));
 
@@ -32,28 +42,53 @@ Session::~Session()
 
 	while(uv_loop_close(_event_loop) == UV_EBUSY)
 	{
-		std::scoped_lock scoped_lock(_lock);
-
 		throw_on_uv_error(
 			uv_run(_event_loop, UV_RUN_DEFAULT));
 	}
+	// Replace with a final_check_multi_info
+	// that will run until all running curl handles are finished.
+	check_multi_info(_multi_handle);
+
 	throw_on_curl_multi_error(
 		curl_multi_cleanup(_multi_handle));
 }
 void
-Session::perform(const Handle& handle)
+Session::add_handle(const Handle& handle)
 {
-	std::scoped_lock scoped_lock(_lock);
+	// Block readers while we write,
+	// but still allow other writers.
+	_queue_lock.lock_shared();
 
 	CURL* curl_handle = curl_easy_init();
 
 	handle.configure_curl_handle(curl_handle);
 
-	throw_on_curl_multi_error(
-		curl_multi_add_handle(_multi_handle, curl_handle));
+	_queue.push(curl_handle);
 
-	throw_on_uv_error(
-		uv_run(_event_loop, UV_RUN_DEFAULT));
+	// Release lock to allow reader to read.
+	_queue_lock.unlock_shared();
+}
+void
+Session::process_handles()
+{
+	while(_keep_thread_alive)
+	{
+		// Block writers while reading.
+		std::scoped_lock scoped_lock(_queue_lock);
+
+		while(!_queue.empty())
+		{
+			CURL* curl_handle = _queue.front();
+			_queue.pop();
+
+			throw_on_curl_multi_error(
+				curl_multi_add_handle(_multi_handle, curl_handle));
+		}
+		throw_on_uv_error(
+			uv_run(_event_loop, UV_RUN_DEFAULT));
+
+		check_multi_info(_multi_handle);
+	}
 }
 void
 Session::throw_on_curl_multi_error(CURLMcode result)
@@ -112,8 +147,6 @@ Session::timeout_cb(uv_timer_t* handle)
 
 	throw_on_curl_multi_error(
 		curl_multi_socket_action(multi_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles));
-
-	check_multi_info(multi_handle);
 }
 void
 Session::timer_close_cb(uv_handle_t* handle)
