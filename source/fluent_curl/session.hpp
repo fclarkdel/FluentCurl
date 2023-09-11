@@ -2,7 +2,7 @@
 #define FLUENTCURL_SESSION_HPP
 
 #include <queue>
-#include <shared_mutex>
+#include <mutex>
 #include <thread>
 
 #include <curl/curl.h>
@@ -41,7 +41,7 @@ private:
 	bool _keep_thread_alive;
 	std::thread _thread;
 
-	std::shared_mutex _queue_lock;
+	std::mutex _queue_lock;
 	std::queue<CURL*> _queue;
 
 	void
