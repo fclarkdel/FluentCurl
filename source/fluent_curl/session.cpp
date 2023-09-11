@@ -239,6 +239,9 @@ session::check_multi_info(CURLM* multi_handle)
 		curl_message != nullptr;
 		curl_message = curl_multi_info_read(multi_handle, &running_handles))
 	{
+		if(curl_message->msg != CURLMSG_DONE)
+			continue;
+
 		CURL* easy_handle = curl_message->easy_handle;
 
 		throw_on_curl_multi_error(

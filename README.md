@@ -51,7 +51,7 @@ int main()
 
     session session;
     
-    session.perform(handle);
+    session.add_handle(handle);
     
     return 0;
 }
