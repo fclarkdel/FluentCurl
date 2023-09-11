@@ -5,14 +5,14 @@
 
 #include <curl/curl.h>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-class CurlResource
+class curl_resource
 {
 public:
-	CurlResource();
+	curl_resource();
 
-	~CurlResource();
+	~curl_resource();
 
 private:
 	static inline std::mutex _global_lock;

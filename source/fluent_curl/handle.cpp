@@ -1,26 +1,26 @@
-#include <FluentCurl/Handle.hpp>
+#include <fluent_curl/handle.hpp>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-Handle::Handle(const Handle& copy):
+handle::handle(const handle& copy):
 	_curl_opts_and_params(copy._curl_opts_and_params)
 {
 }
-Handle&
-Handle::operator=(const Handle& copy)
+handle&
+handle::operator=(const handle& copy)
 {
 	if(this != &copy)
 		_curl_opts_and_params = copy._curl_opts_and_params;
 
 	return *this;
 }
-Handle::Handle(Handle&& move) noexcept:
+handle::handle(handle&& move) noexcept:
 	_curl_opts_and_params(std::move(move._curl_opts_and_params))
 {
 	move._curl_opts_and_params.clear();
 }
-Handle&
-Handle::operator=(Handle&& move) noexcept
+handle&
+handle::operator=(handle&& move) noexcept
 {
 	if(this == &move)
 		return *this;
@@ -32,20 +32,20 @@ Handle::operator=(Handle&& move) noexcept
 	return *this;
 }
 void
-Handle::throw_on_curl_easy_error(CURLcode result)
+handle::throw_on_curl_easy_error(CURLcode result)
 {
 	if(result != CURLE_OK)
 		throw std::runtime_error(curl_easy_strerror(result));
 }
-Handle&
-Handle::reset()
+handle&
+handle::reset()
 {
 	_curl_opts_and_params.clear();
 
 	return *this;
 }
 void
-Handle::configure_curl_handle(CURL* handle) const
+handle::configure_curl_handle(CURL* handle) const
 {
 	for(const auto&[opt, param]: _curl_opts_and_params)
 	{

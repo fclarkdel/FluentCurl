@@ -12,7 +12,7 @@
 
 #include <curl/curl.h>
 
-namespace FluentCurl
+namespace fluent_curl
 {
 template<CURLoption curl_opt>
 struct curl_opt_param

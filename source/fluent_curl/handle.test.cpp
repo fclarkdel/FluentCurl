@@ -1,44 +1,44 @@
 #include <gtest/gtest.h>
 
-#include <FluentCurl/Handle.hpp>
+#include <fluent_curl/handle.hpp>
 
-using namespace FluentCurl;
+using namespace fluent_curl;
 
-TEST(Handle, default_constructor)
+TEST(handle, default_constructor)
 {
-	Handle original;
+	handle original;
 }
-TEST(Handle, copy_constructor)
+TEST(handle, copy_constructor)
 {
-	Handle original;
+	handle original;
 
-	Handle copy(original);
+	handle copy(original);
 }
-TEST(Handle, copy_assignment)
+TEST(handle, copy_assignment)
 {
-	Handle original;
+	handle original;
 
-	Handle copy;
+	handle copy;
 
 	copy = original;
 }
-TEST(Handle, move_constructor)
+TEST(handle, move_constructor)
 {
-	Handle original;
+	handle original;
 
-	Handle move(std::move(original));
+	handle move(std::move(original));
 }
-TEST(Handle, move_assignment)
+TEST(handle, move_assignment)
 {
-	Handle original;
+	handle original;
 
-	Handle move;
+	handle move;
 
 	move = std::move(original);
 }
-TEST(Handle, should_set_options)
+TEST(handle, should_set_options)
 {
-	Handle handle;
+	handle handle;
 
 	std::string write_to;
 
@@ -50,9 +50,9 @@ TEST(Handle, should_set_options)
 									   })
 		.option<CURLOPT_WRITEDATA>(&write_to);
 }
-TEST(Handle, should_reset_options)
+TEST(handle, should_reset_options)
 {
-	Handle handle;
+	handle handle;
 
 	std::string write_to;
 

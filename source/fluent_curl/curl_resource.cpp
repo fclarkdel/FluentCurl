@@ -1,8 +1,8 @@
-#include <FluentCurl/CurlResource.hpp>
+#include <fluent_curl/curl_resource.hpp>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-CurlResource::CurlResource()
+curl_resource::curl_resource()
 {
 	std::scoped_lock scoped_lock(_global_lock);
 
@@ -11,7 +11,7 @@ CurlResource::CurlResource()
 	if(_curl_resource_count == 1)
 		curl_global_init(CURL_GLOBAL_DEFAULT);
 }
-CurlResource::~CurlResource()
+curl_resource::~curl_resource()
 {
 	std::scoped_lock scoped_lock(_global_lock);
 

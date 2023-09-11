@@ -5,30 +5,30 @@
 
 #include <curl/curl.h>
 
-#include <FluentCurl/CurlResource.hpp>
-#include <FluentCurl/HandleOptions.hpp>
+#include <fluent_curl/curl_resource.hpp>
+#include <fluent_curl/handle_options.hpp>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-class Handle: public CurlResource
+class handle: public curl_resource
 {
 public:
-	friend class Session;
+	friend class session;
 
-	Handle() = default;
+	handle() = default;
 
-	Handle(const Handle& copy);
+	handle(const handle& copy);
 
-	Handle&
-	operator=(const Handle& copy);
+	handle&
+	operator=(const handle& copy);
 
-	Handle(Handle&& move) noexcept;
+	handle(handle&& move) noexcept;
 
-	Handle&
-	operator=(Handle&& move) noexcept;
+	handle&
+	operator=(handle&& move) noexcept;
 
 	template<CURLoption curl_opt>
-	Handle&
+	handle&
 	option(curl_opt_param_t<curl_opt> param)
 	{
 		_curl_opts_and_params.emplace_back(curl_opt, (void*)std::move(param));
@@ -36,7 +36,7 @@ public:
 		return *this;
 	};
 
-	Handle&
+	handle&
 	reset();
 
 private:

@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(FluentCurl)
+project(fluent_curl)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(Source/FluentCurl)
+add_subdirectory(source/fluent_curl)
 
 add_library(
-    FluentCurl
+    fluent_curl
     INTERFACE
 )
 target_link_libraries(
-    FluentCurl
+    fluent_curl
     INTERFACE
-    FluentCurl_Library
+    fluent_curl_library
 )

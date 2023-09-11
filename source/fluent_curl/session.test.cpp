@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include <FluentCurl/Session.hpp>
+#include <fluent_curl/session.hpp>
 
-using namespace FluentCurl;
+using namespace fluent_curl;
 
 size_t
 write_cb(
@@ -21,13 +21,13 @@ write_cb(
 
 	return total_size;
 }
-TEST(Session, default_constructor)
+TEST(session, default_constructor)
 {
-	Session session;
+	session session;
 }
-TEST(Session_add_handle, should_add_handle)
+TEST(session_add_handle, should_add_handle)
 {
-	Handle handle;
+	handle handle;
 
 	std::string write_to;
 	std::string expected = "<!doctype html>\n"
@@ -86,13 +86,13 @@ TEST(Session_add_handle, should_add_handle)
 	// 'EXPECT_EQ' is evaluated after the processing thread
 	// inside of the session.
 	{
-		Session session;
+		session session;
 
 		session.add_handle(handle);
 	}
 	EXPECT_EQ(expected, write_to);
 }
-TEST(Session_add_handle, should_be_thread_safe)
+TEST(session_add_handle, should_be_thread_safe)
 {
 	std::string expected = "<!doctype html>\n"
 						   "<html>\n"
@@ -146,10 +146,10 @@ TEST(Session_add_handle, should_be_thread_safe)
 	std::vector<std::string> results;
 	results.reserve(count);
 
-	std::vector<Handle> handles;
+	std::vector<handle> handles;
 	handles.reserve(count);
 	{
-		Session session;
+		session session;
 
 		for(size_t i = 0; i < count; ++i)
 		{

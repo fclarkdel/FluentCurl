@@ -1,8 +1,8 @@
-#include <FluentCurl/Session.hpp>
+#include <fluent_curl/session.hpp>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-Session::Session():
+session::session():
 	_multi_handle(curl_multi_init()),
 	_event_loop(uv_default_loop()),
 	_timer(new uv_timer_t),
@@ -24,9 +24,9 @@ Session::Session():
 	throw_on_curl_multi_error(
 		curl_multi_setopt(_multi_handle, CURLMOPT_TIMERDATA, _timer));
 
-	_thread = std::thread(&Session::process_handles, this);
+	_thread = std::thread(&session::process_handles, this);
 }
-Session::~Session()
+session::~session()
 {
 	// We must first kill the thread before locking the queue,
 	// otherwise we will be in a deadlock.
@@ -53,7 +53,7 @@ Session::~Session()
 		curl_multi_cleanup(_multi_handle));
 }
 void
-Session::add_handle(const Handle& handle)
+session::add_handle(const handle& handle)
 {
 	// Block readers while we write,
 	// but still allow other writers.
@@ -69,7 +69,7 @@ Session::add_handle(const Handle& handle)
 	_queue_lock.unlock_shared();
 }
 void
-Session::process_handles()
+session::process_handles()
 {
 	while(_keep_thread_alive)
 	{
@@ -91,13 +91,13 @@ Session::process_handles()
 	}
 }
 void
-Session::throw_on_curl_multi_error(CURLMcode result)
+session::throw_on_curl_multi_error(CURLMcode result)
 {
 	if(result != CURLM_OK)
 		throw std::runtime_error(curl_multi_strerror(result));
 }
 int
-Session::throw_on_uv_error(int result)
+session::throw_on_uv_error(int result)
 {
 	if(result >= 0)
 		return result;
@@ -111,7 +111,7 @@ Session::throw_on_uv_error(int result)
 	throw std::runtime_error(error_message);
 }
 void
-Session::poll_event_cb(
+session::poll_event_cb(
 	uv_poll_t* handle,
 	int status,
 	int events)
@@ -133,13 +133,13 @@ Session::poll_event_cb(
 		curl_multi_socket_action(context->multi_handle, context->socket, flags, &running_handles));
 }
 void
-Session::poll_close_cb(uv_handle_t* handle)
+session::poll_close_cb(uv_handle_t* handle)
 {
 	delete(PollContext*)handle->data;
 	delete(uv_poll_t*)handle;
 }
 void
-Session::timeout_cb(uv_timer_t* handle)
+session::timeout_cb(uv_timer_t* handle)
 {
 	auto multi_handle = (CURLM*)handle->data;
 
@@ -149,12 +149,12 @@ Session::timeout_cb(uv_timer_t* handle)
 		curl_multi_socket_action(multi_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles));
 }
 void
-Session::timer_close_cb(uv_handle_t* handle)
+session::timer_close_cb(uv_handle_t* handle)
 {
 	delete(uv_timer_t*)handle;
 }
 int
-Session::socket_cb(
+session::socket_cb(
 	CURL* handle,
 	curl_socket_t socket,
 	int action,
@@ -213,7 +213,7 @@ Session::socket_cb(
 	return 0;
 }
 int
-Session::timer_cb(
+session::timer_cb(
 	CURLM* handle,
 	long timeout_ms,
 	void* timer_data)
@@ -233,7 +233,7 @@ Session::timer_cb(
 	return 0;
 }
 void
-Session::check_multi_info(CURLM* multi_handle)
+session::check_multi_info(CURLM* multi_handle)
 {
 	int running_handles = 0;
 

@@ -1,36 +1,37 @@
 #ifndef FLUENTCURL_SESSION_HPP
 #define FLUENTCURL_SESSION_HPP
 
-#include <shared_mutex>
 #include <queue>
+#include <shared_mutex>
 #include <thread>
 
 #include <curl/curl.h>
 #include <uv.h>
 
-#include <FluentCurl/Handle.hpp>
+#include <fluent_curl/curl_resource.hpp>
+#include <fluent_curl/handle.hpp>
 
-namespace FluentCurl
+namespace fluent_curl
 {
-class Session: public CurlResource
+class session: public curl_resource
 {
 public:
-	Session();
+	session();
 
-	~Session();
+	~session();
 
-	Session(const Session& copy) = delete;
+	session(const session& copy) = delete;
 
-	Session&
-	operator=(const Session& copy) = delete;
+	session&
+	operator=(const session& copy) = delete;
 
-	Session(Session&& move) = delete;
+	session(session&& move) = delete;
 
-	Session&
-	operator=(Session&& move) = delete;
+	session&
+	operator=(session&& move) = delete;
 
 	void
-	add_handle(const Handle& handle);
+	add_handle(const handle& handle);
 
 private:
 	CURLM* _multi_handle;

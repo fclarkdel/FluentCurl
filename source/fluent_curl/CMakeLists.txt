@@ -1,17 +1,17 @@
 add_library(
-    FluentCurl_Library
-    CurlResource.hpp
-    CurlResource.cpp
-    Handle.hpp
-    Handle.cpp
-    HandleOptions.hpp
-    Session.hpp
-    Session.cpp
+    fluent_curl_library
+    curl_resource.hpp
+    curl_resource.cpp
+    handle.hpp
+    handle.cpp
+    handle_options.hpp
+    session.hpp
+    session.cpp
 )
 target_include_directories(
-    FluentCurl_Library
+    fluent_curl_library
     PUBLIC
-    ../../Source
+    ../../source
 )
 include(FetchContent)
 
@@ -28,16 +28,16 @@ FetchContent_MakeAvailable(
     libuv
 )
 target_link_libraries(
-    FluentCurl_Library
+    fluent_curl_library
     PUBLIC
     libcurl
     uv
 )
 if(PROJECT_IS_TOP_LEVEL)
     add_executable(
-        FluentCurl_Tests
-        Handle.test.cpp
-        Session.test.cpp
+        fluent_curl_tests
+        handle.test.cpp
+        session.test.cpp
     )
     FetchContent_Declare(
         googletest
@@ -46,9 +46,9 @@ if(PROJECT_IS_TOP_LEVEL)
     FetchContent_MakeAvailable(googletest)
 
     target_link_libraries(
-        FluentCurl_Tests
+        fluent_curl_tests
         PRIVATE
-        FluentCurl_Library
+        fluent_curl_library
         gmock_main
     )
     enable_testing()
