@@ -1,4 +1,4 @@
-# FluentCurl
+# fluent_curl
 
 ## Structure
 
@@ -19,7 +19,9 @@ To provide a type-safe, asynchronous, fluent interface for _libcurl_ utilizing i
 ```c++
 #include <string>
 
-#include <FluentCurl/Session.hpp>
+#include <fluent_curl/session.hpp>
+
+using namespace fluent_curl;
 
 size_t
 write_cb(
@@ -40,14 +42,14 @@ int main()
 {
     std::string write_to;
 
-    Handle handle;
+    handle handle;
 
     handle
         .option<CURLOPT_URL>("https://example.com/")
         .option<CURLOPT_WRITEFUNCTION>(write_cb)
         .option<CURLOPT_WRITEDATA>(&write_to);
 
-    Session session;
+    session session;
     
     session.perform(handle);
     

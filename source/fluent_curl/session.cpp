@@ -55,23 +55,18 @@ session::~session()
 void
 session::add_handle(const handle& handle)
 {
-	// Block readers while we write,
-	// but still allow other writers.
-	_queue_lock.lock_shared();
+	std::scoped_lock scoped_lock(_queue_lock);
 
 	CURL* curl_handle = curl_easy_init();
 
 	handle.configure_curl_handle(curl_handle);
 
 	_queue.push(curl_handle);
-
-	// Release lock to allow reader to read.
-	_queue_lock.unlock_shared();
 }
 void
 session::process_handles()
 {
-	while(_keep_thread_alive)
+	while(true)
 	{
 		// Block writers while reading.
 		std::scoped_lock scoped_lock(_queue_lock);
@@ -88,6 +83,9 @@ session::process_handles()
 			uv_run(_event_loop, UV_RUN_DEFAULT));
 
 		check_multi_info(_multi_handle);
+
+		if(!_keep_thread_alive)
+			break;
 	}
 }
 void
