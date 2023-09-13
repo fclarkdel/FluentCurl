@@ -1,9 +1,9 @@
 add_library(
     fluent_curl_library
-    curl/curl_multi_socket_handle.hpp
-    curl/curl_multi_socket_handle.cpp
-    curl/curl_resource.hpp
-    curl/curl_resource.cpp
+        curl_resources/curl_multi_socket_handle.hpp
+        curl_resources/curl_multi_socket_handle.cpp
+        curl_resources/curl_resource.hpp
+        curl_resources/curl_resource.cpp
     handle.hpp
     handle.cpp
     handle_options.hpp
@@ -39,7 +39,7 @@ target_link_libraries(
 if(PROJECT_IS_TOP_LEVEL)
     add_executable(
         fluent_curl_tests
-        curl/curl_multi_socket_handle.test.cpp
+            curl_resources/curl_multi_socket_handle.test.cpp
         handle.test.cpp
         session.test.cpp
     )

@@ -1,4 +1,4 @@
-#include <fluent_curl/curl/curl_resource.hpp>
+#include <fluent_curl/curl_resources/curl_resource.hpp>
 
 namespace fluent_curl
 {

@@ -1,4 +1,4 @@
-#include <fluent_curl/curl/curl_multi_socket_handle.hpp>
+#include <fluent_curl/curl_resources/curl_multi_socket_handle.hpp>
 
 namespace fluent_curl
 {
@@ -124,7 +124,7 @@ curl_multi_socket_handle::socket_cb(
 
 		break;
 	default:
-		throw std::runtime_error("Unknown curl action specified in socket_cb.");
+		throw std::runtime_error("Unknown curl_resources action specified in socket_cb.");
 	}
 	return 0;
 }
@@ -155,7 +155,7 @@ curl_multi_socket_handle::check_multi_info(CURLM* multi_handle)
 
 	for(
 		CURLMsg* curl_message = curl_multi_info_read(multi_handle, &running_handles);
-		running_handles > 0;
+		running_handles > 0 || curl_message != nullptr;
 		curl_message = curl_multi_info_read(multi_handle, &running_handles))
 	{
 		if(curl_message == nullptr ||
