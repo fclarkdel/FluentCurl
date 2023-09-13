@@ -17,6 +17,7 @@ To provide a type-safe, asynchronous, fluent interface for _libcurl_ utilizing i
 ## Example
 
 ```c++
+#include <iostream>
 #include <string>
 
 #include <fluent_curl/session.hpp>
@@ -48,10 +49,11 @@ int main()
         .option<CURLOPT_URL>("https://example.com/")
         .option<CURLOPT_WRITEFUNCTION>(write_cb)
         .option<CURLOPT_WRITEDATA>(&write_to);
-
-    session session;
+    {
+        session session;
     
-    session.add_handle(handle);
-    
+        session.perform(handle);
+    }
+    std::cout << write_to;
     return 0;
 }
