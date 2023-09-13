@@ -58,19 +58,28 @@ TEST_F(session_test, default_constructor)
 }
 TEST_F(session_test, perform_should_perform_handle)
 {
-	handle handle;
+	std::size_t count = 200;
 
-	std::string write_to;
+	std::vector<handle> handles;
+	handles.reserve(count);
 
-	handle
-		.option<CURLOPT_URL>("localhost")
-		.option<CURLOPT_PORT>(8080)
-		.option<CURLOPT_WRITEFUNCTION>(write_cb)
-		.option<CURLOPT_WRITEDATA>(&write_to);
+	std::vector<std::string> results(count);
 	{
 		session session;
 
-		session.perform(handle);
+		for(std::size_t index = 0; index < count; ++index)
+		{
+			handles.emplace_back();
+
+			handles[index]
+				.option<CURLOPT_URL>("localhost/hi")
+				.option<CURLOPT_PORT>(8080)
+				.option<CURLOPT_WRITEFUNCTION>(write_cb)
+				.option<CURLOPT_WRITEDATA>(&results[index]);
+		}
+		for(const auto& handle: handles)
+			session.perform(handle);
 	}
-	EXPECT_EQ(expected, write_to);
+	for(const auto& result: results)
+		EXPECT_EQ(result, expected);
 }

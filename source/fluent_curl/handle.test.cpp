@@ -4,17 +4,17 @@
 
 using namespace fluent_curl;
 
-TEST(handle, default_constructor)
+TEST(handle_test, default_constructor)
 {
 	handle original;
 }
-TEST(handle, copy_constructor)
+TEST(handle_test, copy_constructor)
 {
 	handle original;
 
 	handle copy(original);
 }
-TEST(handle, copy_assignment)
+TEST(handle_test, copy_assignment)
 {
 	handle original;
 
@@ -22,13 +22,13 @@ TEST(handle, copy_assignment)
 
 	copy = original;
 }
-TEST(handle, move_constructor)
+TEST(handle_test, move_constructor)
 {
 	handle original;
 
 	handle move(std::move(original));
 }
-TEST(handle, move_assignment)
+TEST(handle_test, move_assignment)
 {
 	handle original;
 
@@ -36,7 +36,7 @@ TEST(handle, move_assignment)
 
 	move = std::move(original);
 }
-TEST(handle, should_set_options)
+TEST(handle_test, should_set_options)
 {
 	handle handle;
 
@@ -50,7 +50,7 @@ TEST(handle, should_set_options)
 									   })
 		.option<CURLOPT_WRITEDATA>(&write_to);
 }
-TEST(handle, should_reset_options)
+TEST(handle_test, should_reset_options)
 {
 	handle handle;
 

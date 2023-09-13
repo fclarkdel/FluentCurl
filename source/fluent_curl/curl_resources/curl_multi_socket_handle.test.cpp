@@ -52,13 +52,12 @@ protected:
 };
 TEST_F(curl_multi_socket_handle_test, perform_should_perform_handle)
 {
-	std::size_t count = 20;
+	std::size_t count = 200;
 
 	std::vector<CURL*> easy_handles;
 	easy_handles.reserve(count);
 
-	std::vector<std::string> results;
-	results.reserve(count);
+	std::vector<std::string> results(count);
 
 	curl_multi_socket_handle socket_handle;
 
