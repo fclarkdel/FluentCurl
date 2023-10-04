@@ -25,13 +25,16 @@ curl_multi_socket_handle::curl_multi_socket_handle():
 }
 curl_multi_socket_handle::~curl_multi_socket_handle()
 {
-	uv_close((uv_handle_t*)_timer, timer_close_cb);
+//	uv_close((uv_handle_t*)_timer, timer_close_cb);
 
-	while(uv_loop_close(_event_loop) == UV_EBUSY)
-	{
-		throw_on_uv_error(
-			uv_run(_event_loop, UV_RUN_DEFAULT));
-	}
+//	while(uv_loop_close(_event_loop) == UV_EBUSY)
+//	{
+//		throw_on_uv_error(
+//			uv_run(_event_loop, UV_RUN_DEFAULT));
+//	}
+	throw_on_uv_error(
+		uv_run(_event_loop, UV_RUN_DEFAULT));
+
 	throw_on_curl_multi_error(
 		curl_multi_cleanup(_multi_handle));
 }

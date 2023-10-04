@@ -2,6 +2,7 @@
 #define FLUENTCURL_SESSION_HPP
 
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -37,6 +38,7 @@ public:
 private:
 	std::queue<CURL*> _queue;
 	std::mutex _queue_lock;
+	std::condition_variable _queue_condition_variable;
 	std::thread _thread;
 	std::atomic_bool _keep_thread_alive;
 	curl_multi_socket_handle _curl_multi_socket_handle;

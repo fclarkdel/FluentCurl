@@ -33,6 +33,8 @@ session::perform(const handle& handle)
 	std::scoped_lock scoped_lock(_queue_lock);
 
 	_queue.push(easy_handle);
+
+	_queue_condition_variable.notify_one();
 }
 void
 session::process_queue()
@@ -51,7 +53,13 @@ session::thread_loop()
 	{
 		// Acquire the queue lock such that it
 		// is not written to while we are processing it.
-		std::scoped_lock scoped_lock(_queue_lock);
+		std::unique_lock unique_lock(_queue_lock);
+
+		// Wait on the queue to not be empty.
+		_queue_condition_variable.wait(unique_lock, [&]()
+									   {
+										   return !_keep_thread_alive || !_queue.empty();
+									   });
 
 		process_queue();
 	}
