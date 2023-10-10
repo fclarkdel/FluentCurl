@@ -5,7 +5,7 @@
 
 #include <curl/curl.h>
 
-#include <fluent_curl/curl_resources/curl_resource.hpp>
+#include <fluent_curl/curl_resource.hpp>
 #include <fluent_curl/handle_options.hpp>
 
 namespace fluent_curl

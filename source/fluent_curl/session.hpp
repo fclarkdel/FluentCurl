@@ -1,26 +1,19 @@
 #ifndef FLUENTCURL_SESSION_HPP
 #define FLUENTCURL_SESSION_HPP
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <queue>
 #include <thread>
 
-#include <curl/curl.h>
-#include <uv.h>
-
-#include <fluent_curl/curl_resources/curl_multi_socket_handle.hpp>
+#include <fluent_curl/curl_resource.hpp>
 #include <fluent_curl/handle.hpp>
 
 namespace fluent_curl
 {
-class session
+class session: public curl_resource
 {
 public:
-	session();
+	session() = default;
 
-	~session();
+	~session() = default;
 
 	session(const session& copy) = delete;
 
@@ -36,18 +29,6 @@ public:
 	perform(const handle& handle);
 
 private:
-	std::queue<CURL*> _queue;
-	std::mutex _queue_lock;
-	std::condition_variable _queue_condition_variable;
-	std::thread _thread;
-	std::atomic_bool _keep_thread_alive;
-	curl_multi_socket_handle _curl_multi_socket_handle;
-
-	void
-	process_queue();
-
-	void
-	thread_loop();
 };
 }
 #endif

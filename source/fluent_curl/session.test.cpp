@@ -58,7 +58,7 @@ TEST_F(session_test, default_constructor)
 }
 TEST_F(session_test, perform_should_perform_handle)
 {
-	std::size_t count = 20;
+	std::size_t count = 1000;
 
 	std::vector<handle> handles;
 	handles.reserve(count);
