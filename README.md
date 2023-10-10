@@ -12,7 +12,7 @@ This project inherits definitions from the following documents:
 
 ## Objective
 
-To provide a type-safe, asynchronous, fluent interface for _libcurl_ utilizing its _multi_socket API_ and _libuv_.
+To provide a type-safe, asynchronous, fluent interface for _libcurl_.
 
 ## Example
 
@@ -55,5 +55,6 @@ int main()
         session.perform(handle);
     }
     std::cout << write_to;
+    
     return 0;
 }
