@@ -47,10 +47,34 @@ handle::reset()
 void
 handle::configure_curl_handle(CURL* handle) const
 {
-	for(const auto&[opt, param]: _curl_opts_and_params)
+	for(const auto& [opt, param]: _curl_opts_and_params)
 	{
 		throw_on_curl_easy_error(
 			curl_easy_setopt(handle, opt, param));
 	}
+}
+handle&
+handle::set_transfer_complete_cb(transfer_complete_cb trasfer_complete_cb)
+{
+	_transfer_complete_cb = trasfer_complete_cb;
+
+	return *this;
+}
+handle::transfer_complete_cb*
+handle::get_transfer_complete_cb() const
+{
+	return _transfer_complete_cb;
+}
+handle&
+handle::set_transfer_complete_data(void* data)
+{
+	_transfer_complete_data = data;
+
+	return *this;
+}
+void*
+handle::get_transfer_complete_data() const
+{
+	return _transfer_complete_data;
 }
 }

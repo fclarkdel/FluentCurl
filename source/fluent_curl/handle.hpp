@@ -15,6 +15,8 @@ class handle: public curl_resource
 public:
 	friend class session;
 
+	using transfer_complete_cb = void(CURL*, void*);
+
 	handle() = default;
 
 	handle(const handle& copy);
@@ -37,10 +39,25 @@ public:
 	};
 
 	handle&
+	set_transfer_complete_cb(transfer_complete_cb trasfer_complete_cb);
+
+	transfer_complete_cb*
+	get_transfer_complete_cb() const;
+
+	handle&
+	set_transfer_complete_data(void* data);
+
+	void*
+	get_transfer_complete_data() const;
+
+	handle&
 	reset();
 
 private:
 	std::vector<curl_opt_and_param> _curl_opts_and_params;
+
+	transfer_complete_cb* _transfer_complete_cb = nullptr;
+	void* _transfer_complete_data = nullptr;
 
 	static void
 	throw_on_curl_easy_error(CURLcode result);

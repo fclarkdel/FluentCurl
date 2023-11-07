@@ -25,6 +25,11 @@ write_cb(
 
 	return total_size;
 }
+void
+complete_cb(CURL* handle, void* userdata)
+{
+	std::cout << *(std::string*)userdata << std::endl;
+}
 TEST_F(session_test, default_constructor)
 {
 	session session;
@@ -42,9 +47,9 @@ TEST_F(session_test, perform_should_perform_handle)
 	svr.set_keep_alive_timeout(0);
 
 	svr_thread = std::jthread([&]()
-							 {
-								 svr.listen("0.0.0.0", 8080);
-							 });
+							  {
+								  svr.listen("0.0.0.0", 8080);
+							  });
 
 	expected = "Hello World!";
 
@@ -65,7 +70,9 @@ TEST_F(session_test, perform_should_perform_handle)
 				.option<CURLOPT_URL>("localhost/hi")
 				.option<CURLOPT_PORT>(8080)
 				.option<CURLOPT_WRITEFUNCTION>(write_cb)
-				.option<CURLOPT_WRITEDATA>(&results[index]);
+				.option<CURLOPT_WRITEDATA>(&results[index])
+				.set_transfer_complete_cb(complete_cb)
+				.set_transfer_complete_data(&expected);
 		}
 		for(const auto& handle: handles)
 			session.perform(handle);
